@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Upload</title>
+  </head>
+  <body>
+    {% extends "template.html" %}
+    {% block content %}
+    <h1>Upload</h1>
+    <a href="{{ url_for('upload_file') }}">Carica Immagine</a>
+      
+    {% endblock %}
+   </body>
+</html>

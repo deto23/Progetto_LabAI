@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Show Image</title>
+  </head>
+  <body>
+    {% extends "template.html" %}
+    {% block content %}
+
+    <img src="{{ user_image }}" alt="User Image">
+    <a href="{{ url_for('show_text') }}">Acquisisci testo</a>
+          
+    {% endblock %}
+</body>
+</html>
