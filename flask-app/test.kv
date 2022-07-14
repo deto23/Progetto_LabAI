@@ -1,0 +1,19 @@
+MainLayout:
+    cols: 1
+    spacing: '30dp'
+    padding: '50dp', '50dp', '50dp', '50dp'
+
+    Label:
+        id: status_label
+        size_hint_y: 0.3
+
+    TextInput:
+        id: message_input
+
+    Button:
+        text: 'send message to server'
+        on_press: root.send_message(message_input.text)
+
+    Button:
+        text: 'quit app'
+        on_press: app.stop()
