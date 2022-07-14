@@ -2,14 +2,16 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="{{url_for('static', filename='script/script.js')}}"></script>
     <title>Home</title>
   </head>
   <body>
     {% extends "template.html" %}
     {% block content %}
     
-    <h1> My First Try Using Flask </h1>
-    <p> Flask is Fun </p>
+    <h3>Home</h3>
+    <p>Testo</p>
     
     {% endblock %}
   </body>
