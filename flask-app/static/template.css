@@ -1,5 +1,10 @@
-img{
-    width: 60%;
+.normal{
+    width: 50%;
+    height: auto;
+}
+
+.predict{
+    width: 70%;
     height: auto;
 }
 
