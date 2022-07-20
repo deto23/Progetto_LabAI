@@ -1,6 +1,5 @@
 App: 
 https://youtu.be/fU8uM5oU1wY
 Modello: 
-https://towardsdatascience.com/object-detection-on-newspaper-images-using-yolov3-85acfa563080
 https://app.roboflow.com/objectdetection-t6tid/newspaper_yolo/1
 
