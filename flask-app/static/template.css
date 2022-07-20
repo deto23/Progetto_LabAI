@@ -1,0 +1,23 @@
+img{
+    width: 60%;
+    height: auto;
+}
+
+body{
+    display:flex;
+    min-height:100vh;
+    flex-direction:column;
+}
+
+.main-content{
+    flex:1;
+}
+
+.myFooter{
+    padding: 10px;
+    text-align: center;
+}
+
+p {
+    font-family: Arial, Helvetica, sans-serif;
+  }
