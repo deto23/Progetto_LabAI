@@ -1,20 +1,20 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
+from flask_cors import CORS, cross_origin
+from urllib.parse import urlparse
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import  FileStorage
-import socket
-from urllib.parse import urlparse
 
-import requests
-import cv2
 import numpy as np
-import imutils
 from PIL import Image
 import pytesseract
 import os
+import easyocr, cv2, time
 
 IMAGE = os.path.join('static', 'image')
 
 app = Flask(__name__)
+CORS(app, resources={r"/uploader": {"origins": "*"}})
+app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['UPLOAD_FOLDER'] = IMAGE
 
 @app.route("/")
@@ -24,77 +24,46 @@ def home():
     
     return render_template("home.html")
 
-@app.route("/hello", methods=['POST','GET'])
-def hello():
-    try:
-        message = request.data
-        return do_something(message)
-    except Exception:
-        return  render_template('hello.html', message = 'Error')
-
-
-def do_something(message):
-    with open('messages.log', 'a') as f:
-        current_time = time.ctime()
-        f.write(current_time + ': ' + message + '\n')
     
-    return  render_template('hello.html', message = message)
-
- 
 @app.route("/about")
 def about():
     return render_template("about.html")
 
-@app.route('/upload')
-def upload():
-   return render_template('upload.html')
-
-@app.route('/uploader')
+@app.route('/uploader', methods=['POST'])
+@cross_origin(origin='*', headers=['Content-Type', 'Authorization'])
 def upload_file():
-    url = "http://192.168.1.164:8080/shot.jpg"
+    dir = app.config['UPLOAD_FOLDER']
+    for f in os.listdir(dir):
+        os.remove(os.path.join(dir, f))
 
-    temp = True
-  
-    # While loop to continuously fetching data from the Url
-    while temp:
-        img_resp = requests.get(url)
-        img_arr = np.array(bytearray(img_resp.content), dtype=np.uint8)
-        img = cv2.imdecode(img_arr, -1)
+    file = request.files['file']
+    filename = secure_filename(file.filename)
+    file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
-        img = imutils.rotate(img,-90)
-        img = imutils.resize(img, height = 1920, width=1080)
-        cv2.imshow("Android_cam", img)
-
-        
-
-    
-        if cv2.waitKey(1) == ord('s'):
-            cv2.imwrite(filename='static/image/saved_img.jpg', img=img)
-            print("Image saved!")
-            temp = False
-
-        elif cv2.waitKey(1)  == 27:
-            temp = False
-    
-    cv2.destroyAllWindows()
-
-    return render_template('upload.html')
+    return jsonify(message="POST request returned") 
 
 
 @app.route('/show_img')
 def show_img():
-    full_filename = os.path.join(app.config['UPLOAD_FOLDER'], 'saved_img.jpg')
+    filename = os.path.splitext(os.listdir(app.config['UPLOAD_FOLDER'])[0])
+    full_filename = os.path.join(app.config['UPLOAD_FOLDER'],filename[0] + filename[1])
     return render_template("show_img.html", user_image = full_filename)
 
 @app.route('/show_text')
 def show_text():
-    filename = 'static/image/saved_img.jpg'
+    filename = os.path.splitext(os.listdir(app.config['UPLOAD_FOLDER'])[0])
+    full_filename = os.path.join(app.config['UPLOAD_FOLDER'],filename[0] + filename[1])
 
-    img1 = np.array(Image.open(filename))
+    reader = easyocr.Reader(['it'], gpu=True)
+    output = reader.readtext(full_filename, detail = 0)
+    text = ""
 
-    pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-    text = pytesseract.image_to_string(img1)
+    for i in output:
+        text += i 
+    
+    print(text)
+
     return render_template("show_text.html", user_text = text)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
