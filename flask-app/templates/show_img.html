@@ -14,16 +14,18 @@
   <body>
     {% extends "template.html" %}
     {% block content %}
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-md-2">
-          <a class="btn btn-outline-info" href="{{ url_for('show_text') }}">Acquisisci testo</a>
-        </div>
-        <div class="col-md-8 offset-md-2">
-          <img src="{{ user_image }}" alt="User Image">
+    <section class="main-content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-2">
+            <a class="btn btn-outline-info" href="{{ url_for('show_text') }}">Acquisisci articolo</a>
+          </div>
+          <div class="col-md-8 offset-md-2">
+            <img src="{{ user_image }}" alt="User Image">
+          </div>
         </div>
       </div>
-    </div>
+    </section>
                 
     {% endblock %}
 
