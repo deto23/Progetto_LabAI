@@ -1,0 +1,1 @@
+App che permette di scattare una fotografia all'articolo che si vuole acquisire. L'immagine viene inviata al server se i due dispositivi sono connessi alla stessa rete.
