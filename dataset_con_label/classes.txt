@@ -1,0 +1,3 @@
+titolo
+immagine
+testo_col
