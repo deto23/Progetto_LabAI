@@ -1,6 +1,7 @@
 Applicazione sviluppata utilizzando il Framework Ionic 6 (https://ionicframework.com/), Angular 14 (https://angular.io/) e Capacitor 3 (https://capacitorjs.com/docs). L’applicazione consente di catturare un’immagine tramite la fotocamera del dispositivo. Successivamente l’immagine viene salvata all’interno della memoria interna del dispositivo ed è possibile effettuare 3 operazioni:
 -Upload dell’immagine al server (Python).
--Ruotare l’immagine di 90°.
 -Eliminare l’immagine dalla memoria interna.
 
 Ionic è un Framework che permette di sviluppare applicazioni Ibride, quindi è possibile buildare l’applicazione sia per iOS che per Android utilizzando Capacitor (Un runtime di App multipiattaforma).
+
+link video: https://youtu.be/fU8uM5oU1wY
