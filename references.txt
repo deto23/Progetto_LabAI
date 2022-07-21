@@ -2,4 +2,6 @@ App:
 https://youtu.be/fU8uM5oU1wY
 Modello: 
 https://app.roboflow.com/objectdetection-t6tid/newspaper_yolo/1
+Label Dataset:
+https://github.com/heartexlabs/labelImg
 
