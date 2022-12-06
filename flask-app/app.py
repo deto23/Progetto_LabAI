@@ -1,10 +1,10 @@
+from asyncio import wait
 from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS, cross_origin
 from urllib.parse import urlparse
 from werkzeug.utils import secure_filename
 from PIL import Image
 from requests_toolbelt.multipart.encoder import MultipartEncoder
-from PIL import Image
 from roboflow import Roboflow
 
 import os, easyocr
@@ -18,12 +18,16 @@ import requests
 
 IMAGE = os.path.join('static', 'image')
 IMAGE2 = os.path.join('static', 'result')
+OBJECT_TEXT = os.path.join('static', 'object', "testo")
+OBJECT_TITLE = os.path.join('static', 'object', "titolo")
 
 app = Flask(__name__)
 CORS(app, resources={r"/uploader": {"origins": "*"}})
 app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['UPLOAD_FOLDER'] = IMAGE
 app.config['RESULT_FOLDER'] = IMAGE2
+app.config['OBJECT_TEXT_FOLDER'] = OBJECT_TEXT
+app.config['OBJECT_TITLE_FOLDER'] = OBJECT_TITLE
 
 @app.route("/")
 def home():
@@ -68,7 +72,7 @@ def extract_image_text():
     project = workspace.project("newspaper_yolo")
     #project.upload(full_filename)
 
-    version = project.version(1)
+    version = project.version(3)
     model = version.model
     prediction = model.predict(full_filename)
 
@@ -77,53 +81,72 @@ def extract_image_text():
         os.remove(os.path.join(dir, f))
     prediction.save(output_path="static/result/predictions.jpg")
 
-    num_col = 0
-    for c in prediction:
-        if(c["class"] == "testo_col"):
-            num_col+=1
-            '''
-            with Image.open("static/result/predictions.jpg") as im:
-                x = int(c["x"])
-                y = int(c["y"])
-                w = int(c["width"])
-                h = int(c["height"])
-                im.crop((x, y, w, h-y)).save("titolo.jpg")
-            '''
-                
+    n_col = 1
+    #img = Image.open("static/result/predictions.jpg")
+    print(full_filename)
+    img_real = Image.open(full_filename)
 
-
-    '''
-    img = Image.open(full_filename)
-    rgb_img = img.convert('RGB')
-        
-    dir = app.config['UPLOAD_FOLDER']
+    dir = app.config['OBJECT_TEXT_FOLDER']
     for f in os.listdir(dir):
         os.remove(os.path.join(dir, f))
 
-    rgb_img.save('static/image/image.jpg')
-
-    img = cv2.imread('static/image/image.jpg')
-    image = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    pilImage = Image.fromarray(image)
-
-    buffered = io.BytesIO()
-    pilImage.save(buffered, quality=100, format="JPEG")
-
-    m = MultipartEncoder(fields={'file': ('static/image/image.jpg', buffered.getvalue(), "image/jpeg")})
-
-    response = requests.post("https://detect.roboflow.com/newspaper_yolo/1?api_key=bB8ECItRBAYsBNPihGMZ", data=m, headers={'Content-Type': m.content_type})
-    '''
+    dir = app.config['OBJECT_TITLE_FOLDER']
+    for f in os.listdir(dir):
+        os.remove(os.path.join(dir, f))
 
     reader = easyocr.Reader(['it'], gpu=True)
-    output = reader.readtext(full_filename, detail = 0)
+    column = []
+
+    for c in prediction:
+        if(c["class"] == "titolo" or c["class"] == "testo_col"):
+            print(c)
+            x = c["x"]
+            y = c["y"]
+            w = c["width"]
+            h = c["height"]
+
+            left = x - (w/2)
+            right = x + (w/2)
+            top = y - (h/2)
+            bottom = y + (h/2)
+
+            box = (left, top, right, bottom)
+            print(box)
+                
+            img2 = img_real.crop(box)
+
+        if(c["class"] == "titolo"):
+            name = "static/object/titolo/titolo.jpg"
+            img2.save(name)
+            title = reader.readtext(name, detail = 0)
+            print("Save title")
+        elif(c["class"] == "testo_col"):
+            name = "static/object/testo/colonna" + str(n_col) + ".jpg"
+            img2.save(name)
+            column.append((x, reader.readtext(name, detail = 0)))
+            print("Column Append")
+            n_col += 1
+
+    column.sort(key=lambda tup: tup[0])
+
     text = ""
-
-    for i in output:
-        text += i 
+    print("Start text: " + text)
+    for c in column:
+        for i in c[1]:
+            text += " " + i 
+            print("Start adding text: " + text)
     
-    print(text)
+    text = text.replace("- ", "")
 
-    return render_template("show_text.html", user_image = "static/result/predictions.jpg", user_text = text)
+    title_string = ""
+    print("Start title: " + title_string)
+    for t in title:
+        title_string += " " + t
+        print("Start adding title: " + title_string)
+
+    print("End process")
+
+    return render_template("show_text.html", user_image = "static/result/predictions.jpg", user_text = text, user_title = title_string)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
