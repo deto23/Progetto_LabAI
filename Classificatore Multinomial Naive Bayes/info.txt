@@ -1,0 +1,1 @@
+Nella cartella è presente il file Python dove è stato addestrato il cìClassificatore e dopo sono stati esportati il Vettorizzatore e il Modello. 
